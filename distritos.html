@@ -1,0 +1,156 @@
+<!-- Instituto Tecnologico de Costa Rica
+Visualizacion de Informacion - I Semestre 2023
+Proyecto II
+Profesor Armando Arce Orozco
+Santiago Moreno Granados - 2022040858
+Isaac Cordero Tapia - 2022193583 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proyecto II</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .bar {
+            fill: url(#gradient);
+            stroke: #fff;
+        }
+        .label {
+            font-size: 10px;
+            text-anchor: middle;
+        }
+        .center-label {
+            font-size: 14px;
+            text-anchor: middle;
+            font-weight: bold;
+        }
+        .legend {
+            font-size: 12px;
+        }
+        .legend rect {
+            stroke: none;
+        }
+        .legend text {
+            fill: #000;
+            font-weight: bold;
+            alignment-baseline: middle;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sundown Chart: Distritos (sin el cambio a los colores)</h1>
+    <p>Se muestra la población de cada distrito del país.</p>
+
+    <!-- Versión con colores distintos y leyenda -->
+    <div id="chart2"></div>
+
+    <h1>Sundown Chart: Distritos (con el cambio a los colores)</h1>
+    <p>Se muestra la población de cada distrito del país.</p>
+    <!-- Versión con colores y leyenda -->
+    <div id="chart1"></div>
+
+    <script>
+        const dataUrl = "distritos.csv";
+
+        d3.csv(dataUrl).then(function(data) {
+            data.forEach(d => {
+                d.POBL_2011 = +d.POBL_2011;
+            });
+
+            const width = 800;
+            const height = 400;
+            const radius = Math.min(width, height * 2) / 2;
+
+            const groupedData = d3.group(data, d => d.ID.split('.')[0]);
+
+            // colores para cada provincia
+            const colorScale = d3.scaleOrdinal()
+                .domain(groupedData.keys())
+                .range(d3.schemeCategory10);
+
+            const radialScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.POBL_2011)])
+                .range([0, radius]);
+
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(d => radialScale(d.data.POBL_2011));
+
+            const pie = d3.pie()
+                .sort(null)
+                .value(d => d.POBL_2011)
+                .startAngle(-Math.PI / 2)
+                .endAngle(Math.PI / 2);
+
+            // Gráfico con colores y leyenda
+            const svg1 = d3.select("#chart1").append("svg")
+                .attr("width", width)
+                .attr("height", height + 50);
+
+            const g1 = svg1.append("g")
+                .attr("transform", `translate(${width / 2}, ${height})`);
+
+            const gArcs1 = g1.selectAll(".arc")
+                .data(pie(data))
+                .enter().append("g")
+                .attr("class", "arc");
+
+            gArcs1.append("path")
+                .attr("d", arc)
+                .style("fill", d => colorScale(d.data.ID.split('.')[0]));
+
+            gArcs1.append("text")
+                .attr("transform", function(d) {
+                    const [x, y] = arc.centroid(d);
+                    const midAngle = (d.startAngle + d.endAngle) / 2;
+                    const offset = midAngle < Math.PI ? 1 : -1;
+                    return `translate(${x * 1.1 * offset}, ${y * 1.1 * offset})`;
+                })
+                .attr("dy", ".35em")
+                .attr("class", "label")
+                .text(d => d.data.CANTON);
+
+            // Etiqueta para el primer gráfico
+            svg1.append("text")
+                .attr("class", "center-label")
+                .attr("x", width / 2)
+                .attr("y", height + 20) 
+                .text("Población total por distrito en 2011");
+
+            // Gráfico sin colores ni leyenda
+            const svg2 = d3.select("#chart2").append("svg")
+                .attr("width", width)
+                .attr("height", height + 50);
+
+            const g2 = svg2.append("g")
+                .attr("transform", `translate(${width / 2}, ${height})`);
+
+            const gArcs2 = g2.selectAll(".arc")
+                .data(pie(data))
+                .enter().append("g")
+                .attr("class", "arc");
+
+            gArcs2.append("path")
+                .attr("d", arc);
+
+            gArcs2.append("text")
+                .attr("transform", function(d) {
+                    const [x, y] = arc.centroid(d);
+                    const midAngle = (d.startAngle + d.endAngle) / 2;
+                    const offset = midAngle < Math.PI ? 1 : -1;
+                    return `translate(${x * 1.1 * offset}, ${y * 1.1 * offset})`;
+                })
+                .attr("dy", ".35em")
+                .attr("class", "label")
+                .text(d => d.data.CANTON);
+
+            // Etiqueta para el segundo gráfico
+            svg2.append("text")
+                .attr("class", "center-label")
+                .attr("x", width / 2)
+                .attr("y", height + 20) 
+                .text("Población total por distrito en 2011 (sin colores ni leyenda)");
+        });
+    </script>
+</body>
+</html>
