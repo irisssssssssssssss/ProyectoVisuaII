@@ -9,7 +9,7 @@ Isaac Cordero Tapia - 2022193583 -->
 <head>
     <meta charset="UTF-8">
     <title>Proyecto II</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="./d3/d3.v6.min.js"></script>
     <style>
         .bar {
             fill: url(#gradient);
@@ -33,21 +33,19 @@ Isaac Cordero Tapia - 2022193583 -->
         .legend text {
             fill: #000;
             font-weight: bold;
-            alignment-baseline: middle;
         }
     </style>
 </head>
 <body>
     <h1>Sundown Chart: VUE</h1>
     <p>Gráfico con el valor "VALUE" para cada VUE ID</p>
-
     <h1>Sundown Chart: VUE sin cambios en los colores</h1>
     <div id="chart2"></div>
     <h1>Sundown Chart: VUE con cambios en los colores</h1>
     <div id="chart1"></div>
 
     <script>
-        const dataUrl = "VUE.csv";
+        const dataUrl = "./files/vue.csv";
 
         d3.csv(dataUrl).then(function(data) {
             data.forEach(d => {

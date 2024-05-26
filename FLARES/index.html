@@ -9,7 +9,7 @@ Isaac Cordero Tapia - 2022193583 -->
 <head>
     <meta charset="UTF-8">
     <title>Proyecto II</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="./d3/d3.v6.min.js"></script>
     <style>
         .bar {
             fill: url(#gradient);
@@ -33,56 +33,47 @@ Isaac Cordero Tapia - 2022193583 -->
         .legend text {
             fill: #000;
             font-weight: bold;
-            alignment-baseline: middle;
         }
     </style>
 </head>
 <body>
-    <h1>Sundown Chart: Distritos (sin el cambio a los colores)</h1>
-    <p>Se muestra la población de cada distrito del país.</p>
+    <h1>Sundown Chart: flares</h1>
+    <p>Gráfico con el valor "SIZE" para cada FLARE</p>
 
-    <!-- Versión con colores distintos y leyenda -->
+    <h1>Sundown Chart: flares sin cambios en los colores</h1>
     <div id="chart2"></div>
-
-    <h1>Sundown Chart: Distritos (con el cambio a los colores)</h1>
-    <p>Se muestra la población de cada distrito del país.</p>
-    <!-- Versión con colores y leyenda -->
+    <h1>Sundown Chart: flares con cambios en los colores</h1>
     <div id="chart1"></div>
 
     <script>
-        const dataUrl = "distritos.csv";
+        const dataUrl = "./files/flares.csv";
 
         d3.csv(dataUrl).then(function(data) {
             data.forEach(d => {
-                d.POBL_2011 = +d.POBL_2011;
+                d.value = +d.value;
             });
 
             const width = 800;
             const height = 400;
             const radius = Math.min(width, height * 2) / 2;
 
-            const groupedData = d3.group(data, d => d.ID.split('.')[0]);
-
-            // colores para cada provincia
-            const colorScale = d3.scaleOrdinal()
-                .domain(groupedData.keys())
-                .range(d3.schemeCategory10);
+            const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
             const radialScale = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.POBL_2011)])
+                .domain([0, d3.max(data, d => d.value)])
                 .range([0, radius]);
 
             const arc = d3.arc()
                 .innerRadius(0)
-                .outerRadius(d => radialScale(d.data.POBL_2011));
+                .outerRadius(d => radialScale(d.value));
 
             const pie = d3.pie()
                 .sort(null)
-                .value(d => d.POBL_2011)
+                .value(d => d.value)
                 .startAngle(-Math.PI / 2)
                 .endAngle(Math.PI / 2);
 
-            // Gráfico con colores y leyenda
+            // colores
             const svg1 = d3.select("#chart1").append("svg")
                 .attr("width", width)
                 .attr("height", height + 50);
@@ -97,7 +88,7 @@ Isaac Cordero Tapia - 2022193583 -->
 
             gArcs1.append("path")
                 .attr("d", arc)
-                .style("fill", d => colorScale(d.data.ID.split('.')[0]));
+                .style("fill", (d, i) => colorScale(i));
 
             gArcs1.append("text")
                 .attr("transform", function(d) {
@@ -108,16 +99,16 @@ Isaac Cordero Tapia - 2022193583 -->
                 })
                 .attr("dy", ".35em")
                 .attr("class", "label")
-                .text(d => d.data.CANTON);
+                .text(d => d.data.ID);
 
-            // Etiqueta para el primer gráfico
+            // labels
             svg1.append("text")
                 .attr("class", "center-label")
                 .attr("x", width / 2)
                 .attr("y", height + 20) 
-                .text("Población total por distrito en 2011");
+                .text("Size de cada flare");
 
-            // Gráfico sin colores ni leyenda
+            // chart sin cambios de color
             const svg2 = d3.select("#chart2").append("svg")
                 .attr("width", width)
                 .attr("height", height + 50);
@@ -131,7 +122,8 @@ Isaac Cordero Tapia - 2022193583 -->
                 .attr("class", "arc");
 
             gArcs2.append("path")
-                .attr("d", arc);
+                .attr("d", arc)
+                .style("fill", "#007bff");
 
             gArcs2.append("text")
                 .attr("transform", function(d) {
@@ -142,14 +134,14 @@ Isaac Cordero Tapia - 2022193583 -->
                 })
                 .attr("dy", ".35em")
                 .attr("class", "label")
-                .text(d => d.data.CANTON);
+                .text(d => d.data.ID);
 
-            // Etiqueta para el segundo gráfico
+            // labels
             svg2.append("text")
                 .attr("class", "center-label")
                 .attr("x", width / 2)
                 .attr("y", height + 20) 
-                .text("Población total por distrito en 2011 (sin colores ni leyenda)");
+                .text("Size de cada flare");
         });
     </script>
 </body>

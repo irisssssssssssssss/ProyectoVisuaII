@@ -1,0 +1,4 @@
+Links a las páginas para visualizar los gráficos:
+https://proyecto2flares.netlify.app/
+https://proyecto2distritos.netlify.app/
+https://proyecto2vue.netlify.app/
